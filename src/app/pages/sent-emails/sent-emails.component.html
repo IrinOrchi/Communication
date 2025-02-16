@@ -108,20 +108,20 @@ Email Template(s)
             <input type="checkbox" />
           </th>
           <!-- Action Dropdown -->
-          <th class="p-2">
-            <select class="border border-gray-300 text-sm p-1.5 rounded w-32">
+          <th class="p-2 text-center">
+            <select class="border border-gray-300 text-sm p-1.5 w-24  rounded">
               <option selected disabled>Action</option>
               <option>Delete Selected</option>
             </select>
           </th>
           <!-- View Dropdown -->
-          <th class="p-2">
+          <th class="p-2 text-xs  text-left">
             View
-            <select class="border border-gray-300 p-2 rounded" (change)="updatePageSize($event)">
+            <select class="border border-gray-300 p-1.5 rounded" (change)="updatePageSize($event)">
               <option *ngFor="let size of [10, 15, 20]" [value]="size">{{ size }}</option>
             </select>
           </th>
-          <th class="p-3 text-gray-600">
+          <th class="p-2 text-black text-center">
             {{ getStartIndex() }} - {{ getEndIndex() }} of {{ totalRecords }}
           </th>          
           <th class="p-3"></th>
