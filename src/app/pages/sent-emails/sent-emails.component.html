@@ -102,22 +102,36 @@ Email Template(s)
   <!-- Table -->
   <div *ngIf="!loading()" class="bg-white  rounded-md overflow-hidden">
     <table class="w-full border border-gray-100">
-      <thead class="bg-[#f5f5f5] text-black text-[14px] px-6 py-10">
+      <thead class="bg-[#f5f5f5] text-black text-[14px]">
         <tr>
-          <th class="p-3">
+          <th class="p-3 ml-8">
             <input type="checkbox" />
           </th>
-          <th class="p-3">view
-          <select class="border p-2 rounded" (change)="updatePageSize($event)">
-            <option *ngFor="let size of [10, 15, 20]" [value]="size">{{ size }}</option>
-          </select>
-        </th>
+      
+          <!-- Action Dropdown -->
+          <th class="p-2 ml-8">
+            <select class="border border-gray-300 p-2 rounded">
+              <option>Action</option>
+              <option>Delete Selected</option>
+            </select>
+          </th>
+      
+          <!-- View Dropdown -->
+          <th class="p-2 ml-16">
+            View
+            <select class="border border-gray-300 p-2 rounded" (change)="updatePageSize($event)">
+              <option *ngFor="let size of [10, 15, 20]" [value]="size">{{ size }}</option>
+            </select>
+          </th>
+          <th class="p-3 text-gray-600">1-8 of 110</th>
           <th class="p-3"></th>
-          <th class="p-3"></th>
-          <th class="p-3"></th>
-          <th class="p-3"></th>
+          <th class="p-3 text-right">
+            <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+              Email Templates
+            </button>
+          </th>
         </tr>
-      </thead>
+      </thead>   
       <tbody>
         <ng-container *ngIf="emails.length === 0; else dataTable">
           <tr>
@@ -134,16 +148,15 @@ Email Template(s)
  <!-- Data Table Rows -->
 <ng-template #dataTable>
   <ng-container *ngIf="jobs.length > 0; else noData">
-
   <tr *ngFor="let email of emails; let i = index" class="border-t">
-    <td class="p-3">
+    <td class="p-3 -ml-8">
       <input type="checkbox" />
     </td>
     <td class="p-3">
       <button class="flex items-center gap-4 cursor-pointer" (click)="toggleEmailDetail(i)">
         <span *ngIf="email.isRead" class="icon icon-check-double text-gray-500" title="Read"></span>
         <span *ngIf="!email.isRead" class="icon icon-check text-gray-500" title="Unread"></span>
-        <span class="ml-8">{{ email.name }}</span>      </button>
+        <span class="ml-8">{{ email.name }}</span></button>
     </td>
     <td class="p-3">
       <button class="font-semibold cursor-pointer" (click)="toggleEmailDetail(i)">
@@ -160,7 +173,7 @@ Email Template(s)
       </ng-container>
     </td>
    
-    <td class="p-3">
+    <td class="p-3 -ml-8">
       <button class="flex items-center border tex-[12px] border-[#e0e0e0] text-[#757575] px-3 py-1 rounded transition-all duration-[2000ms] ease-in-out hover:bg-red-600 hover:text-white"
         (click)="deleteEmail(email.rId)">
         <span class="icon icon-trash mr-2"></span>Delete
@@ -168,6 +181,8 @@ Email Template(s)
     </td>
   </tr>
   </ng-container>
+
+  
 <!-- No Data Found Message -->
 <ng-template #noData>
   <tr>
