@@ -19,6 +19,7 @@ export class SentEmailsComponent {
   totalPages: number = 0;
   currentPage: number = 1;
   pageSize: number = 10;
+  itemsPerPage: number = 10;
   loading = signal<boolean>(false); 
   emailDetail: any = null; 
   expandedEmailIndex: number | null = null; 
@@ -162,6 +163,12 @@ export class SentEmailsComponent {
       this.isInviteChecked.set(!this.isInviteChecked());
       this.loadSentEmails(1);
     }
+  }
+  getStartIndex(): number {
+    return (this.currentPage - 1) * this.itemsPerPage + 1;
+  }
+  getEndIndex(): number {
+    return Math.min(this.currentPage * this.itemsPerPage, this.totalRecords);
   }
   deleteEmail(rId: number): void {
     const companyId = this.communicationService.getCompanyId();
