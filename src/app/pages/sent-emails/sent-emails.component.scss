@@ -1,0 +1,24 @@
+.container {
+    max-width: 1000px;
+  }
+  
+  input[type="radio"],
+  input[type="checkbox"] {
+    accent-color: #3b82f6;
+  }
+  
+  table {
+    th {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  
+    td {
+      text-wrap: nowrap;
+    }
+  }
+  
+  button {
+    transition: background 0.3s ease;
+  }
+  
