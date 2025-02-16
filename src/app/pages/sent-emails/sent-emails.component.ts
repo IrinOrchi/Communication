@@ -3,6 +3,7 @@ import { Component, signal } from '@angular/core';
 import { CommunicationService } from '../../Services/communication.service';
 import { Job } from '../../Models/communication';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sent-emails',
@@ -29,7 +30,7 @@ export class SentEmailsComponent {
   selectedReadStatus = signal<string>('all');
   isInviteChecked = signal<boolean>(false); 
 
-  constructor(private communicationService: CommunicationService) {}
+  constructor(private communicationService: CommunicationService , private router: Router) {}
 
   ngOnInit(): void {
     this.loadSentEmails(this.currentPage);
@@ -184,5 +185,8 @@ export class SentEmailsComponent {
         console.error('Error during delete operation:', error);
       }
     });
+  }
+  redirectToEmailTemplate(): void {
+    this.router.navigate(['/email-template'], );
   }
 }

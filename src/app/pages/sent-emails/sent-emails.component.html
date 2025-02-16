@@ -126,7 +126,8 @@ Email Template(s)
           </th>          
           <th class="p-3"></th>
           <th class="p-3 text-right">
-            <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+            <button class="bg-[#0e73a9] text-white px-4 py-2 rounded hover:bg-[#08547a] transition"
+            (click)="redirectToEmailTemplate()">
               Email Templates
             </button>
           </th>
@@ -172,9 +173,9 @@ Email Template(s)
                   <ng-template #noJob></ng-template>
                 </ng-container>
               </td>
-              <td class="p-3">
+              <td class="p-3 text-right">
                 <button class="flex items-center border text-[12px] border-[#e0e0e0] text-[#757575] px-3 py-1 rounded transition-all duration-[2000ms] ease-in-out hover:bg-red-600 hover:text-white"
-                  (click)="deleteEmail(email.rId)">
+                (click)="deleteEmail(email.rId)">
                   <span class="icon icon-trash mr-2"></span>Delete
                 </button>
               </td>
