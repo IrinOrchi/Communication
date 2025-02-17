@@ -29,7 +29,7 @@ Email Template(s)
   <div class="bg-white mt-4 rounded-sm border shadow-sm mb-2 p-4">
   <!-- Description -->
   <h3 class="text-[16px] font-bold text-gray-700 mb-2">Email Template(s)
-  </h3>  <!-- Search Bar -->
+  </h3> 
    <!-- Search Bar -->
    <div class="relative max-w-6xl mx-auto mt-4">
     <input
@@ -38,7 +38,7 @@ Email Template(s)
       placeholder="Search by job title"
       [formControl]="keyword"
       (keyup.enter)="onSearch()" 
-      [disabled]="isInviteDisabled()" 
+      [disabled]="isInviteDisabled() " 
       [style.cursor]="isInviteDisabled() ? 'not-allowed' : 'pointer'" 
 
       />
@@ -79,7 +79,7 @@ Email Template(s)
       </label>
     </div>
     <!-- Invite Checkbox -->
-    <div class="mt-2">
+    <div class="mt-2 mb-4">
       <label>
         <input 
           type="checkbox" 
@@ -100,130 +100,162 @@ Email Template(s)
 </div>
 
   <!-- Table -->
-  <div *ngIf="!loading()" class="bg-white  rounded-md overflow-hidden">
+  <div *ngIf="!loading()" class="bg-white rounded-md overflow-hidden">
     <table class="w-full border border-gray-100">
-      <thead class="bg-[#f5f5f5] text-black text-[14px] px-6 py-10">
+      <thead class="bg-[#f5f5f5] text-black text-[14px]">
         <tr>
-          <th class="p-3">
-            <input type="checkbox" />
+          <th class="p-3  text-center">
+            <input type="checkbox" [checked]="isAllSelected()" (change)="toggleAllCheckboxes($event)" />
           </th>
-          <th class="p-3">view
-          <select class="border p-2 rounded" (change)="updatePageSize($event)">
-            <option *ngFor="let size of [10, 15, 20]" [value]="size">{{ size }}</option>
-          </select>
-        </th>
+          <!-- Action Dropdown -->
+          <th class="p-2 text-right relative inline-block">
+            <div class="relative inline-block">
+            <button class="border border-gray-300 font-normal text-sm p-1.5 text-[12px] w-24 rounded flex items-center justify-center gap-2" 
+            (click)="toggleDeleteButton()">
+            Action
+            <span class="icon icon-sort-down text-xs"></span> 
+          </button>
+            <button *ngIf="isDeleteSelectedVisible" 
+              class="absolute mt-0 top-full left-0 font-normal w-32 bg-white border border-gray-300 text-sm p-1.5 rounded shadow-lg transition-all duration-300 ease-in-out hover:text-black"
+              (click)="deleteSelectedEmails()">
+               Delete Selected
+            </button>
+            </div>
+          </th>
+          <!-- View Dropdown -->
+          <th class="p-2 text-[14px] text-left">
+            View
+            <select class="border border-gray-300 font-normal p-1 rounded" (change)="updatePageSize($event)">
+              <option *ngFor="let size of [10, 15, 20]" [value]="size">{{ size }}</option>
+            </select>
+          </th>
+          <th class="p-2 text-black text-center">
+            {{ getStartIndex() }} - {{ getEndIndex() }} of {{ totalRecords }}
+          </th>          
           <th class="p-3"></th>
-          <th class="p-3"></th>
-          <th class="p-3"></th>
-          <th class="p-3"></th>
+          <th class="p-3 text-right flex items-center justify-end gap-2">
+            <button class="bg-[#0e73a9] text-white px-4 py-2 rounded hover:bg-[#08547a] transition"
+            (click)="redirectToEmailTemplate()">
+              Email Templates
+            </button>
+          </th>
         </tr>
-      </thead>
+      </thead>   
       <tbody>
         <ng-container *ngIf="emails.length === 0; else dataTable">
           <tr>
-            <td colspan="5" class="py-16 text-center text-sm font-medium text-gray-500">
+            <td colspan="6" class="py-16 text-center text-sm font-medium text-gray-500">
               <div class="flex flex-col justify-center items-center">
                 <i class="icon icon-envelope text-gray-400 text-[64px] mb-2"></i>
-                <span class="text-[16px] font-bold text-[#0e73a9]">No email is found
-                </span>
+                <span class="text-[16px] font-bold text-[#0e73a9]">No email is found</span>
               </div>
             </td>
           </tr>
         </ng-container>
-      
- <!-- Data Table Rows -->
-<ng-template #dataTable>
-  <tr *ngFor="let email of emails; let i = index" class="border-t">
-    <td class="p-3">
-      <input type="checkbox" />
-    </td>
-    <td class="p-3">
-      <button class="flex items-center gap-2 cursor-pointer" (click)="toggleEmailDetail(i)">
-        <span *ngIf="email.isRead" class="icon icon-check-double text-gray-500" title="Read"></span>
-        <span *ngIf="!email.isRead" class="icon icon-check text-gray-500" title="Unread"></span>
-        {{ email.name }}
-      </button>
-    </td>
-    <td class="p-3">
-      <button class="font-semibold cursor-pointer" (click)="toggleEmailDetail(i)">
-        {{ email.subject }}
-      </button>
-    </td>
-    <td class="p-3 flex items-center gap-2">
-      <span class="icon icon-calendar text-gray-500"></span> {{ email.date }}
-    </td>
-    <td class="p-3">
-      <ng-container *ngIf="selectedEmailCategory() === 'ap' || selectedEmailCategory() === 'al'">
-        <span *ngIf="email.job && email.job !== 'Null'; else noJob">{{ email.job }}</span>
-        <ng-template #noJob></ng-template>
-      </ng-container>
-    </td>
-    
-   
-    <td class="p-3">
-      <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-      (click)="deleteEmail(email.rId)">
-        Delete
-      </button>
-    </td>
-  </tr>
-
   
-   
-
-   <ng-container *ngFor="let email of emails; let i = index">
-  <tr *ngIf="expandedEmailIndex === i" class="border-t bg-gray-100">
-    <td colspan="5" class="p-4">
-      <div class="relative">
-        <button class="absolute top-2 right-2 bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded-md"
-          (click)="toggleEmailDetail(i)">
-          Close <i class="icon-times ml-1"></i>
-        </button>
-    
-        <!-- Header -->
-        <h4 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-          <i class="icon-check-sign text-green-500"></i> Sent Mail
-        </h4>
-    
-        <!-- Mail Info -->
-        <div class="mt-2">
-          <p class="flex items-center gap-2">
-            <i class="icon-envelope text-gray-500"></i>
-            <span class="font-medium">Mailed From:</span> {{ emailDetail?.company }}
-          </p>
-          <p class="flex items-center gap-2">
-            <i class="icon-calendar text-gray-500"></i>
-            <span class="font-medium">Mailed on:</span> {{ emailDetail?.date | date: 'medium' }}
-          </p>
-          <p class="flex items-center gap-2">
-            <i class="icon-file text-gray-500"></i>
-            <span class="font-medium">Subject:</span> {{ emailDetail?.subject }}
-          </p>
-        </div>
-    
-        <!-- Email Body -->
-        <div class="mt-4 border-t pt-4">
-          <p class="font-semibold text-gray-800">Dear <span class="font-semibold">{{ email.name }}</span>,</p>
-          <div class="text-gray-700 leading-relaxed">
-            {{ emailDetail?.body }}
-          </div>
-        </div>
-    
-        <!-- Footer -->
-        <div class="mt-4 text-gray-700 border-t pt-4">
-          Regards, <br>
-          <span class="font-semibold">{{ emailDetail?.sender }}</span> <br>
-          {{ emailDetail?.designation }}
-        </div>
-      </div>
-    </td>
-  </tr>
-  </ng-container>
-</ng-template>
+        <!-- Data Table Rows -->
+        <ng-template #dataTable>
+          <ng-container *ngIf="emails.length > 0; else noData">
+            <tr *ngFor="let email of emails; let i = index" class="border-t cursor-pointer" [class.bg-[#ffffcc]]="selectedEmails.includes(email.rId)">
+              <td class="p-3  text-center">
+                <input type="checkbox" (change)="toggleCheckbox(i, $event)" [checked]="selectedEmails.includes(email.rId)" />
+              </td>
+              <td class="p-3">
+                <button class="flex items-center gap-4 cursor-pointer" (click)="toggleEmailDetail(i)">
+                  <span *ngIf="email.isRead" class="icon icon-check-double text-gray-500" title="Read"></span>
+                  <span *ngIf="!email.isRead" class="icon icon-check text-gray-500" title="Unread"></span>
+                  <span class="ml-8">{{ email.name }}</span>
+                </button>
+              </td>
+              <td class="p-3">
+                <button class="font-semibold cursor-pointer" (click)="toggleEmailDetail(i)">
+                  {{ email.subject }}
+                </button>
+              </td>
+              <td class="p-3 text-right flex items-center justify-end gap-2">
+                <span class="icon icon-calendar text-gray-500"></span> {{ email.date }}
+              </td>
+              <td class="p-3">
+                <ng-container *ngIf="selectedEmailCategory() === 'ap' || selectedEmailCategory() === 'al'">
+                  <span *ngIf="email.job && email.job !== 'Null'; else noJob">{{ email.job }}</span>
+                  <ng-template #noJob></ng-template>
+                </ng-container>
+              </td>
+              <td class="p-3 text-right flex items-center justify-end gap-2">
+                <button class="flex items-center border text-[12px] border-[#e0e0e0] text-[#757575] px-3 py-1 rounded transition-all duration-[2000ms] ease-in-out hover:bg-red-600 hover:text-white"
+                (click)="deleteEmail(email.rId)">
+                  <span class="icon icon-trash mr-2"></span>Delete
+                </button>
+              </td>
+            </tr>
+          </ng-container>
+  
+          <!-- No Data Found Message -->
+          <ng-template #noData>
+            <tr>
+              <td colspan="5" class="px-6 py-16 text-center text-sm font-medium text-gray-500">
+                <div class="flex flex-col items-center">
+                  <i class="icon icon-envelope text-gray-400" style="font-size: 64px;"></i>
+                  <span class="text-[16px] font-semibold text-[#0e73a9] mt-2">No data found</span>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+  
+          <!-- Expanded Email Details -->
+          <ng-container *ngFor="let email of emails; let i = index">
+            <tr *ngIf="expandedEmailIndex === i" class="border-t bg-gray-100">
+              <td colspan="5" class="p-4">
+                <div class="relative">
+                  <button class="absolute top-2 right-2 bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded-md"
+                    (click)="toggleEmailDetail(i)">
+                    Close <i class="icon-times ml-1"></i>
+                  </button>
+          
+                  <!-- Header -->
+                  <h4 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <i class="icon-check-sign text-green-500"></i> Sent Mail
+                  </h4>
+          
+                  <!-- Mail Info -->
+                  <div class="mt-2">
+                    <p class="flex items-center gap-2">
+                      <i class="icon-envelope text-gray-500"></i>
+                      <span class="font-medium">Mailed From:</span> {{ emailDetail?.company }}
+                    </p>
+                    <p class="flex items-center gap-2">
+                      <i class="icon-calendar text-gray-500"></i>
+                      <span class="font-medium">Mailed on:</span> {{ emailDetail?.date | date: 'medium' }}
+                    </p>
+                    <p class="flex items-center gap-2">
+                      <i class="icon-file text-gray-500"></i>
+                      <span class="font-medium">Subject:</span> {{ emailDetail?.subject }}
+                    </p>
+                  </div>
+          
+                  <!-- Email Body -->
+                  <div class="mt-4 border-t pt-4">
+                    <p class="font-semibold text-gray-800">Dear <span class="font-semibold">{{ email.name }}</span>,</p>
+                    <div class="text-gray-700 leading-relaxed">
+                      {{ emailDetail?.body }}
+                    </div>
+                  </div>
+          
+                  <!-- Footer -->
+                  <div class="mt-4 text-gray-700 border-t pt-4">
+                    Regards, <br>
+                    <span class="font-semibold">{{ emailDetail?.sender }}</span> <br>
+                    {{ emailDetail?.designation }}
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </ng-template>
       </tbody>  
     </table>
   </div>
-
+  
 
 <!-- Pagination -->
 <div class="mt-4 flex justify-center space-x-2">

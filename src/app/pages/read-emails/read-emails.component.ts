@@ -3,6 +3,7 @@ import { CommunicationService } from '../../Services/communication.service';
 import { CommonModule } from '@angular/common';
 import { Job } from '../../Models/communication';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-read-emails',
@@ -12,28 +13,33 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
   styleUrl: './read-emails.component.scss'
 })
 export class ReadEmailsComponent {
-    jobs: Job[] = [];
-    emails: any[] = [];
-    totalRecords: number = 0;
-    totalPages: number = 0;
-    currentPage: number = 1;
-    pageSize: number = 10;
-    loading = signal<boolean>(false); 
-    emailDetail: any = null; 
-    expandedEmailIndex: number | null = null;  
-    keyword = new FormControl('');
-   
+  jobs: Job[] = [];
+  checkedEmails: boolean[] = [];
+  selectedEmails: number[] = [];
+  emails: any[] = [];
+  totalRecords: number = 0;
+  totalPages: number = 0;
+  currentPage: number = 1;
+  pageSize: number = 10;
+  itemsPerPage: number = 10;
+  loading = signal<boolean>(false); 
+  emailDetail: any = null; 
+  expandedEmailIndex: number | null = null; 
+  keyword = new FormControl('');
+  isDeleteSelectedVisible: boolean = false;
   
   
     selectedEmailCategory = signal<string>('cv');
     selectedReadStatus = signal<string>('read');
     isInviteChecked = signal<boolean>(false); 
   
-    constructor(private communicationService: CommunicationService) {}
+    constructor(private communicationService: CommunicationService,private router: Router) {}
   
     ngOnInit(): void {
       this.selectedEmailCategory.set('cv');  
       this.selectedReadStatus.set('read');  
+      this.checkedEmails = new Array(this.emails.length).fill(false);
+
   
       const r_Type = this.getReadStatusValue('read') ?? undefined; 
       this.loadSentEmails(this.currentPage, r_Type);
@@ -181,7 +187,53 @@ export class ReadEmailsComponent {
     redirectTo(url: string) {
       window.location.href = url;
     }
+    getStartIndex(): number {
+      return (this.currentPage - 1) * this.itemsPerPage + 1;
+    }
+    getEndIndex(): number {
+      return Math.min(this.currentPage * this.itemsPerPage, this.totalRecords);
+    }
+    deleteSelectedEmails(): void {
+      if (this.selectedEmails.length === 0) {
+        return;
+      }
+      const companyId = this.communicationService.getCompanyId();
+      const requestPayload = { companyId, rIds: this.selectedEmails };
+      this.communicationService.deleteEmail(requestPayload).subscribe({
+        next: (response) => {
+          if (response.responseType === 'Success') {
+            this.emails = this.emails.filter(email => !this.selectedEmails.includes(email.rId)); 
+            this.selectedEmails = []; 
+            this.isDeleteSelectedVisible = false;
+          }
+        },
+      });
+    }
+    isAllSelected(): boolean {
+      return this.selectedEmails.length === this.emails.length;
+    }
     
+    
+    toggleAllCheckboxes(event: any): void {
+      if (event.target.checked) {
+        this.selectedEmails = this.emails.map(email => email.rId); 
+      } else {
+        this.selectedEmails = []; 
+      }
+    }
+    toggleCheckbox(index: number, event: any): void {
+      if (event.target.checked) {
+        this.selectedEmails.push(this.emails[index].rId); 
+      } else {
+        this.selectedEmails = this.selectedEmails.filter(id => id !== this.emails[index].rId); 
+      }
+    }
+    toggleDeleteButton(): void {
+      this.isDeleteSelectedVisible = !this.isDeleteSelectedVisible;  
+    }
+    redirectToEmailTemplate(): void {
+      this.router.navigate(['/email-template'], );
+    }
   }
 
 
