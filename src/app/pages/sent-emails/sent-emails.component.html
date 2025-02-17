@@ -105,7 +105,7 @@ Email Template(s)
       <thead class="bg-[#f5f5f5] text-black text-[14px]">
         <tr>
           <th class="p-3">
-            <input type="checkbox" (change)="toggleAllCheckboxes($event)" [checked]="isAllSelected()" />
+            <input type="checkbox" [checked]="isAllSelected()" (change)="toggleAllCheckboxes($event)" />
           </th>
           <!-- Action Dropdown -->
           <th class="p-2 text-left">
@@ -148,7 +148,7 @@ Email Template(s)
         <!-- Data Table Rows -->
         <ng-template #dataTable>
           <ng-container *ngIf="emails.length > 0; else noData">
-            <tr *ngFor="let email of emails; let i = index" class="border-t">
+            <tr *ngFor="let email of emails; let i = index" class="border-t cursor-pointer" [class.bg-[#ffffcc]]="checkedEmails[i]">
               <td class="p-3">
                 <input type="checkbox" (change)="toggleCheckbox(i, $event)" [checked]="checkedEmails[i]" />
               </td>
