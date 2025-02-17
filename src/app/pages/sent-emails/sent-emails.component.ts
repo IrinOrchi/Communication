@@ -74,7 +74,7 @@ export class SentEmailsComponent {
     }
   }
   isAllSelected(): boolean {
-    return this.checkedEmails.every(checked => checked);
+    return this.checkedEmails.length > 0 && this.checkedEmails.every(checked => checked);
   }
   
   toggleAllCheckboxes(event: Event) {

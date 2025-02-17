@@ -105,7 +105,6 @@ Email Template(s)
       <thead class="bg-[#f5f5f5] text-black text-[14px]">
         <tr>
           <th class="p-3">
-            <!-- Header checkbox to select/deselect all checkboxes -->
             <input type="checkbox" (change)="toggleAllCheckboxes($event)" [checked]="isAllSelected()" />
           </th>
           <!-- Action Dropdown -->
@@ -124,7 +123,7 @@ Email Template(s)
           </th>
           <th class="p-2 text-black text-center">
             {{ getStartIndex() }} - {{ getEndIndex() }} of {{ totalRecords }}
-          </th>
+          </th>          
           <th class="p-3"></th>
           <th class="p-3 text-right flex items-center justify-end gap-2">
             <button class="bg-[#0e73a9] text-white px-4 py-2 rounded hover:bg-[#08547a] transition"
@@ -133,7 +132,7 @@ Email Template(s)
             </button>
           </th>
         </tr>
-      </thead>
+      </thead>   
       <tbody>
         <ng-container *ngIf="emails.length === 0; else dataTable">
           <tr>
@@ -151,7 +150,6 @@ Email Template(s)
           <ng-container *ngIf="emails.length > 0; else noData">
             <tr *ngFor="let email of emails; let i = index" class="border-t">
               <td class="p-3">
-                <!-- Individual checkbox for each row -->
                 <input type="checkbox" (change)="toggleCheckbox(i, $event)" [checked]="checkedEmails[i]" />
               </td>
               <td class="p-3">
@@ -195,8 +193,58 @@ Email Template(s)
               </td>
             </tr>
           </ng-template>
+  
+          <!-- Expanded Email Details -->
+          <ng-container *ngFor="let email of emails; let i = index">
+            <tr *ngIf="expandedEmailIndex === i" class="border-t bg-gray-100">
+              <td colspan="5" class="p-4">
+                <div class="relative">
+                  <button class="absolute top-2 right-2 bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded-md"
+                    (click)="toggleEmailDetail(i)">
+                    Close <i class="icon-times ml-1"></i>
+                  </button>
+          
+                  <!-- Header -->
+                  <h4 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <i class="icon-check-sign text-green-500"></i> Sent Mail
+                  </h4>
+          
+                  <!-- Mail Info -->
+                  <div class="mt-2">
+                    <p class="flex items-center gap-2">
+                      <i class="icon-envelope text-gray-500"></i>
+                      <span class="font-medium">Mailed From:</span> {{ emailDetail?.company }}
+                    </p>
+                    <p class="flex items-center gap-2">
+                      <i class="icon-calendar text-gray-500"></i>
+                      <span class="font-medium">Mailed on:</span> {{ emailDetail?.date | date: 'medium' }}
+                    </p>
+                    <p class="flex items-center gap-2">
+                      <i class="icon-file text-gray-500"></i>
+                      <span class="font-medium">Subject:</span> {{ emailDetail?.subject }}
+                    </p>
+                  </div>
+          
+                  <!-- Email Body -->
+                  <div class="mt-4 border-t pt-4">
+                    <p class="font-semibold text-gray-800">Dear <span class="font-semibold">{{ email.name }}</span>,</p>
+                    <div class="text-gray-700 leading-relaxed">
+                      {{ emailDetail?.body }}
+                    </div>
+                  </div>
+          
+                  <!-- Footer -->
+                  <div class="mt-4 text-gray-700 border-t pt-4">
+                    Regards, <br>
+                    <span class="font-semibold">{{ emailDetail?.sender }}</span> <br>
+                    {{ emailDetail?.designation }}
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
         </ng-template>
-      </tbody>
+      </tbody>  
     </table>
   </div>
   
