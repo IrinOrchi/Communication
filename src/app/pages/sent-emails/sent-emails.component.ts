@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 })
 export class SentEmailsComponent {
   jobs: Job[] = [];
+  checkedEmails: boolean[] = [];
 
   emails: any[] = [];
   totalRecords: number = 0;
@@ -35,6 +36,8 @@ export class SentEmailsComponent {
   ngOnInit(): void {
     this.loadSentEmails(this.currentPage);
     this.fetchJobs();
+    this.checkedEmails = new Array(this.emails.length).fill(false);
+
 
   }
 
@@ -69,6 +72,18 @@ export class SentEmailsComponent {
           },
         });
     }
+  }
+  isAllSelected(): boolean {
+    return this.checkedEmails.every(checked => checked);
+  }
+  
+  toggleAllCheckboxes(event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.checkedEmails = this.emails.map(() => checked);
+  }
+  
+  toggleCheckbox(index: number, event: Event) {
+    this.checkedEmails[index] = (event.target as HTMLInputElement).checked;
   }
   
   handleResponse(response: any, pageNo: number): void {
