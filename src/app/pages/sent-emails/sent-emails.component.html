@@ -104,20 +104,26 @@ Email Template(s)
     <table class="w-full border border-gray-100">
       <thead class="bg-[#f5f5f5] text-black text-[14px]">
         <tr>
-          <th class="p-3">
+          <th class="p-3  text-center">
             <input type="checkbox" [checked]="isAllSelected()" (change)="toggleAllCheckboxes($event)" />
           </th>
           <!-- Action Dropdown -->
-          <th class="p-2 text-left">
-            <select class="border border-gray-300 text-sm p-1.5 w-24  rounded">
-              <option selected disabled>Action</option>
-              <option>Delete Selected</option>
-            </select>
+          <th class="p-2 text-right relative">
+            <button class="border border-gray-300 font-normal text-sm p-1.5 text-[12px] w-24 rounded flex items-center justify-center gap-2" 
+            (click)="toggleDeleteButton()">
+            Action
+            <span class="icon icon-sort-down text-xs"></span> 
+          </button>
+            <button *ngIf="isDeleteSelectedVisible" 
+              class="absolute top-full left-0 font-normal w-32 bg-white border border-gray-300 text-sm p-1.5 rounded shadow-lg transition-all duration-300 ease-in-out hover:text-black"
+              (click)="deleteSelectedEmails()">
+               Delete Selected
+            </button>
           </th>
           <!-- View Dropdown -->
-          <th class="p-2 text-xs text-left">
+          <th class="p-2 text-[14px] text-left">
             View
-            <select class="border border-gray-300 p-1.5 rounded" (change)="updatePageSize($event)">
+            <select class="border border-gray-300 font-normal p-1 rounded" (change)="updatePageSize($event)">
               <option *ngFor="let size of [10, 15, 20]" [value]="size">{{ size }}</option>
             </select>
           </th>
@@ -148,9 +154,9 @@ Email Template(s)
         <!-- Data Table Rows -->
         <ng-template #dataTable>
           <ng-container *ngIf="emails.length > 0; else noData">
-            <tr *ngFor="let email of emails; let i = index" class="border-t cursor-pointer" [class.bg-[#ffffcc]]="checkedEmails[i]">
-              <td class="p-3">
-                <input type="checkbox" (change)="toggleCheckbox(i, $event)" [checked]="checkedEmails[i]" />
+            <tr *ngFor="let email of emails; let i = index" class="border-t cursor-pointer" [class.bg-[#ffffcc]]="selectedEmails.includes(email.rId)">
+              <td class="p-3  text-center">
+                <input type="checkbox" (change)="toggleCheckbox(i, $event)" [checked]="selectedEmails.includes(email.rId)" />
               </td>
               <td class="p-3">
                 <button class="flex items-center gap-4 cursor-pointer" (click)="toggleEmailDetail(i)">

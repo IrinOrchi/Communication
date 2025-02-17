@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
 export class SentEmailsComponent {
   jobs: Job[] = [];
   checkedEmails: boolean[] = [];
-
+  selectedEmails: number[] = [];
   emails: any[] = [];
   totalRecords: number = 0;
   totalPages: number = 0;
@@ -26,6 +26,7 @@ export class SentEmailsComponent {
   emailDetail: any = null; 
   expandedEmailIndex: number | null = null; 
   keyword = new FormControl('');
+  isDeleteSelectedVisible: boolean = false;
 
   selectedEmailCategory = signal<string>('cv');
   selectedReadStatus = signal<string>('all');
@@ -74,18 +75,44 @@ export class SentEmailsComponent {
     }
   }
   isAllSelected(): boolean {
-    return this.checkedEmails.length > 0 && this.checkedEmails.every(checked => checked);
+    return this.selectedEmails.length === this.emails.length;
   }
   
-  toggleAllCheckboxes(event: Event) {
-    const checked = (event.target as HTMLInputElement).checked;
-    this.checkedEmails = this.emails.map(() => checked);
+  
+  toggleAllCheckboxes(event: any): void {
+    if (event.target.checked) {
+      this.selectedEmails = this.emails.map(email => email.rId); 
+    } else {
+      this.selectedEmails = []; 
+    }
   }
   
-  toggleCheckbox(index: number, event: Event) {
-    this.checkedEmails[index] = (event.target as HTMLInputElement).checked;
+  toggleCheckbox(index: number, event: any): void {
+    if (event.target.checked) {
+      this.selectedEmails.push(this.emails[index].rId); 
+    } else {
+      this.selectedEmails = this.selectedEmails.filter(id => id !== this.emails[index].rId); 
+    }
   }
-  
+  toggleDeleteButton(): void {
+    this.isDeleteSelectedVisible = !this.isDeleteSelectedVisible;  
+  }
+  deleteSelectedEmails(): void {
+    if (this.selectedEmails.length === 0) {
+      return;
+    }
+    const companyId = this.communicationService.getCompanyId();
+    const requestPayload = { companyId, rIds: this.selectedEmails };
+    this.communicationService.deleteEmail(requestPayload).subscribe({
+      next: (response) => {
+        if (response.responseType === 'Success') {
+          this.emails = this.emails.filter(email => !this.selectedEmails.includes(email.rId)); 
+          this.selectedEmails = []; 
+          this.isDeleteSelectedVisible = false;
+        }
+      },
+    });
+  }
   handleResponse(response: any, pageNo: number): void {
     if (response.responseType === 'success' && response.data) {
       this.emails = [...response.data.emails];
