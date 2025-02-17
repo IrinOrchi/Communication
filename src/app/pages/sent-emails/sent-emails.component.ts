@@ -113,6 +113,7 @@ export class SentEmailsComponent {
       },
     });
   }
+  
   handleResponse(response: any, pageNo: number): void {
     if (response.responseType === 'success' && response.data) {
       this.emails = [...response.data.emails];

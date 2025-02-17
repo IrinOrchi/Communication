@@ -108,17 +108,19 @@ Email Template(s)
             <input type="checkbox" [checked]="isAllSelected()" (change)="toggleAllCheckboxes($event)" />
           </th>
           <!-- Action Dropdown -->
-          <th class="p-2 text-right relative">
+          <th class="p-2 text-right relative inline-block">
+            <div class="relative inline-block">
             <button class="border border-gray-300 font-normal text-sm p-1.5 text-[12px] w-24 rounded flex items-center justify-center gap-2" 
             (click)="toggleDeleteButton()">
             Action
             <span class="icon icon-sort-down text-xs"></span> 
           </button>
             <button *ngIf="isDeleteSelectedVisible" 
-              class="absolute top-full left-0 font-normal w-32 bg-white border border-gray-300 text-sm p-1.5 rounded shadow-lg transition-all duration-300 ease-in-out hover:text-black"
+              class="absolute mt-0 top-full left-0 font-normal w-32 bg-white border border-gray-300 text-sm p-1.5 rounded shadow-lg transition-all duration-300 ease-in-out hover:text-black"
               (click)="deleteSelectedEmails()">
                Delete Selected
             </button>
+            </div>
           </th>
           <!-- View Dropdown -->
           <th class="p-2 text-[14px] text-left">
