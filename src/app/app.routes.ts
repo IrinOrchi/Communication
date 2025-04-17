@@ -6,17 +6,14 @@ import { TemplateEditorComponent } from './pages/template-editor/template-editor
 import { SentEmailsComponent } from './pages/sent-emails/sent-emails.component';
 import { ReadEmailsComponent } from './pages/read-emails/read-emails.component';
 import { TemplateCreatorComponent } from './pages/template-creator/template-creator.component';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-    {
-        path:"",
-        redirectTo: 'communication',
-        pathMatch: 'full'
-    },
   
     {
-        path:'communication',
+        path:'',
         component: CommunicationComponent,
+        // canActivate: [AuthGuard], 
 
     },
     {

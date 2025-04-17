@@ -19,6 +19,7 @@ export class EmailTemplateComponent {
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.companyId = params['companyId'] || this.communicationService.getCompanyId();
+      this.companyId = window.localStorage.getItem('CompanyId') || '';
 
       if (!this.companyId) {
         console.error('Company ID is missing in EmailTemplateComponent');

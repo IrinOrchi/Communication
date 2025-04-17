@@ -8,22 +8,27 @@ import { EmailTemplate } from '../Models/communication';
 })
 export class CommunicationService {
 
-  private apiUrl = 'https://localhost:7004/api/EmailsOverview/GetSentEmails';
-  private jobEmailsUrl = 'https://localhost:7004/api/EmailTemplate/EmailTemplates';
-  private viewTemplatesUrl = 'https://localhost:7004/api/EmailTemplate/EmailTemplateViewer';
-  private emailTemplateUrl = 'https://localhost:7004/api/EmailTemplate/EmailTemplateEditor';
-  private emailUpdateTemplateUrl = 'https://localhost:7004/api/EmailTemplate/UpdateEmailTemplate';
-  private getemailsinboxUrl = 'https://localhost:7004/api/EmailsOverview/GetEmailsInbox';
-  private emailDetailsUrl = 'https://localhost:7004/api/EmailsOverview/GetEmailsDetails';
-  private deleteEmailUrl = 'https://localhost:7004/api/EmailsOverview/DeleteEmails';
-  private createTemplateUrl = 'https://localhost:7004/api/EmailTemplate/CreateEmailTemplate';
+  private apiUrl = 'https://testmongo.bdjobs.com/Employer-Communications/api/EmailsOverview/GetSentEmails';
+  private jobEmailsUrl = 'https://testmongo.bdjobs.com/Employer-Communications/api/EmailTemplate/EmailTemplates';
+  private viewTemplatesUrl = 'https://testmongo.bdjobs.com/Employer-Communications/api/EmailTemplate/EmailTemplateViewer';
+  private emailTemplateUrl = 'https://testmongo.bdjobs.com/Employer-Communications/api/EmailTemplate/EmailTemplateEditor';
+  private emailUpdateTemplateUrl = 'https://testmongo.bdjobs.com/Employer-Communications/api/EmailTemplate/UpdateEmailTemplate';
+  private getemailsinboxUrl = 'https://testmongo.bdjobs.com/Employer-Communications/api/EmailsOverview/GetEmailsInbox';
+  private emailDetailsUrl = 'https://testmongo.bdjobs.com/Employer-Communications/api/EmailsOverview/GetEmailsDetails';
+  private deleteEmailUrl = 'https://testmongo.bdjobs.com/Employer-Communications/api/EmailsOverview/DeleteEmails';
+  private createTemplateUrl = 'https://testmongo.bdjobs.com/Employer-Communications/api/EmailTemplate/CreateEmailTemplate';
+
   constructor(private http: HttpClient) {}
 
   setCompanyId(companyId: string): void {
-    sessionStorage.setItem('companyId', companyId);
+    localStorage.setItem('CompanyId', companyId);
   }
   getCompanyId(): string {
-    return sessionStorage.getItem('companyId') || ''; 
+    let companyId = localStorage.getItem('companyId');
+    if (!companyId) {
+      companyId = localStorage.getItem('CompanyId') || '';
+    }
+    return companyId;
   }
   getEmailsOverview(companyId: string): Observable<any> {
     return this.http.get(`${this.apiUrl}?companyId=${companyId}`);
@@ -87,6 +92,18 @@ export class CommunicationService {
   }
   createTemplate(payload: any): Observable<any> {
     return this.http.post<any>(this.createTemplateUrl, payload);
+  }
+
+  getJobSpecificEmails(companyId: string, jobId: number, r_Type?: number): Observable<any> {
+    let params = new HttpParams()
+      .set('companyId', companyId)
+      .set('jobId', jobId.toString());
+    
+    if (r_Type !== undefined) {
+      params = params.set('r_Type', r_Type.toString());
+    }
+    
+    return this.http.get<any>(this.getemailsinboxUrl, { params });
   }
 }
 

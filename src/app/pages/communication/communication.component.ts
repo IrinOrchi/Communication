@@ -3,9 +3,7 @@ import { HeaderComponent } from "../../components/header/header.component";
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { CommunicationService } from '../../Services/communication.service';
 import { CommonModule, DatePipe } from '@angular/common';
-import { SalesContactComponent } from '../../components/sales-contact/sales-contact.component';
-import { FooterComponent } from '../../components/footer/footer.component';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Job } from '../../Models/communication';
 
 @Component({
@@ -17,99 +15,144 @@ import { Job } from '../../Models/communication';
 })
 export class CommunicationComponent implements OnInit {
   jobs: Job[] = [];
-  sentEmails = signal({ cv: 0, applicants: 0, invitation: 0 });
-  readEmails = signal({ cv: 0, applicants: 0, invitation: 0 });
+  sentEmails = signal({ cv: 0, ap: 0, iv: 0 });
+  readEmails = signal({ cv: 0, ap: 0, iv: 0 });
   keyword = new FormControl('');
   currentPage = 1;
   pageSize = 10;
-  totalPages = 1;
+  totalPages: number = 0;
   loading = signal<boolean>(false); 
-
   totalPagesArray: number[] = [];
-  companyId: string = 'ZxU0PRC='; 
-  constructor(private communicationService: CommunicationService, private router: Router) {}
+  companyId: string = ''; 
+  dataLoaded = signal<boolean>(false);
+  
+  constructor(private communicationService: CommunicationService, private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.communicationService.setCompanyId(this.companyId);
-    this.communicationService.getCompanyId();
-    this.fetchEmails();
-    this.fetchJobs();
-
+    this.companyId = localStorage.getItem('CompanyId') || '';
+    
+    
+    if (!this.companyId) {
+      this.companyId = localStorage.getItem('CompanyId') || '';
+    }
+    
+   
+    if (this.companyId) {
+      this.communicationService.setCompanyId(this.companyId);
+     
+      this.fetchEmails().then(() => {
+        this.fetchJobs();
+      });
+    } else {
+      this.loading.set(false);
+    }
   }
+  
   redirectTo(url: string) {
     window.location.href = url;
   }
-  // fetchJobs(searchQuery: string = ''): void {
-  //   const companyId = 'ZxU0PRC=';  
-  //   const pageNo = this.currentPage; 
-    
-  //   this.communicationService.getJobEmails(companyId, pageNo, searchQuery).subscribe(response => {
-  //     if (response.data && response.data.list && response.data.list.length > 0) {
-  //       this.jobs = response.data.list;
-  //     } else {
-  //       this.jobs = []; 
-  //     }
-  //   });
-  // }
   
   fetchJobs(searchQuery: string = ''): void {
     this.loading.set(true);
-    this.communicationService.getJobEmails(this.companyId, this.currentPage, searchQuery).subscribe(response => {
-      if (response.data && response.data.list?.length > 0) {
-        this.jobs = response.data.list;
-        this.totalPages = response.data.totalPages;
-        this.totalPagesArray = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-      } else {
+    this.communicationService.getJobEmails(this.companyId, this.currentPage, searchQuery).subscribe({
+      next: (response) => {
+        if (response.data && response.data.list?.length > 0) {
+          this.jobs = response.data.list;
+          this.totalPages = response.data.totalPages;
+          this.totalPagesArray = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+        } else {
+          this.jobs = [];
+        }
+        this.loading.set(false);
+        this.dataLoaded.set(true);
+      },
+      error: (error) => {
+        console.error('Error fetching jobs:', error);
         this.jobs = [];
+        this.loading.set(false);
+        this.dataLoaded.set(true);
       }
-      this.loading.set(false);
-
     });
   }
+  
   onSearch(): void {
     const query = this.keyword.value?.trim();
     this.fetchJobs(query);
   }
 
-  changePage(direction: number): void {
-    const newPage = this.currentPage + direction;
-    if (newPage >= 1 && newPage <= this.totalPages) {
-      this.currentPage = newPage;
+  changePage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
       this.fetchJobs();
     }
   }
-  fetchEmails(): void {
-    this.communicationService.getEmailsOverview(this.companyId).subscribe(response => {
-      if (response.responseType === 'success' && response.data?.list) {
-        this.jobs = response.data.list.map((item: any) => ({
-          title: item.job,
-          publishedDate: new Date(item.publishDate),
-          sentEmails: item.sentEmail,
-          readEmails: item.readEmail
-        }));
   
-        this.sentEmails.set({
-          cv: response.data.emailCVbank,
-          applicants: response.data.emailByJobs,
-          invitation: response.data.invited
-        });
-  
-        this.readEmails.set({
-          cv: response.data.readEmailCVbank,
-          applicants: response.data.readEmailbyJobs,
-          invitation: response.data.invitedRead
-        });
-      }
+  fetchEmails(): Promise<void> {
+    return new Promise((resolve) => {
+      this.communicationService.getEmailsOverview(this.companyId).subscribe({
+        next: (response) => {
+          if (response.responseType === 'success' && response.data) {
+         
+            this.sentEmails.set({
+              cv: response.data.emailCVbank || 0,
+              ap: response.data.emailByJobs || 0,
+              iv: response.data.invited || 0
+            });
+    
+            this.readEmails.set({
+              cv: response.data.readEmailCVbank || 0,
+              ap: response.data.readEmailbyJobs || 0,
+              iv: response.data.invitedRead || 0
+            });
+          }
+          resolve();
+        },
+        error: (error) => {
+          console.error('Error fetching emails:', error);
+          resolve();
+        }
+      });
     });
   }
+  
   redirectToEmailTemplate(): void {
     this.router.navigate(['/email-template'], { queryParams: { companyId: this.companyId } });
   }
-  redirectToSentEmails() {
-    this.router.navigate(['/sent-emails']); 
+  
+  redirectToSentEmails(c_Type: string) {
+    this.router.navigate(['/sent-emails'], { queryParams: { companyId: this.companyId, c_Type } }); 
   }
-  redirectToReadEmails() {
-    this.router.navigate(['/read-emails']);
+  
+  redirectToReadEmails(c_Type: string) {
+    this.router.navigate(['/read-emails'], { 
+      queryParams: { 
+        companyId: this.companyId, 
+        c_Type,
+        r_Type: 1
+      } 
+    });
+  }
+
+  redirectToJobSentEmails(jobId: number) {
+    this.router.navigate(['/sent-emails'], { 
+      queryParams: { 
+        companyId: this.companyId, 
+        jobId: jobId,
+        type: 'job',
+        r_Type: 0
+      } 
+    });
+  }
+
+  redirectToJobReadEmails(jobId: number) {
+    this.router.navigate(['/read-emails'], { 
+      queryParams: { 
+        companyId: this.companyId, 
+        jobId: jobId,
+        type: 'job',
+        r_Type: 1
+      } 
+    });
   }
 }
   

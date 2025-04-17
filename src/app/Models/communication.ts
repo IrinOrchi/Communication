@@ -1,4 +1,5 @@
 export interface Job {
+    jobId: number;
     job: string;
     publishDate: Date;
     sentEmail: number;

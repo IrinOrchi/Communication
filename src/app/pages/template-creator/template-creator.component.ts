@@ -31,6 +31,7 @@ export class TemplateCreatorComponent implements OnInit {
   ngOnInit() {
     this.activatedRoute.queryParams.subscribe(params => {
       this.companyId = params['companyId'] || '';
+      
     });
 
     this.templateForm = this.fb.group({

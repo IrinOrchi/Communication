@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { CommunicationService } from '../../Services/communication.service';
 import { Job } from '../../Models/communication';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-sent-emails',
@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
   templateUrl: './sent-emails.component.html',
   styleUrl: './sent-emails.component.scss'
 })
-export class SentEmailsComponent {
+export class SentEmailsComponent implements OnInit {
   jobs: Job[] = [];
   checkedEmails: boolean[] = [];
   selectedEmails: number[] = [];
@@ -24,39 +24,80 @@ export class SentEmailsComponent {
   itemsPerPage: number = 10;
   loading = signal<boolean>(false); 
   emailDetail: any = null; 
-  expandedEmailIndex: number | null = null; 
+  expandedEmailIndex: number | null = null;
   keyword = new FormControl('');
   isDeleteSelectedVisible: boolean = false;
-
+  maxVisiblePages = 3; 
+  i: number = 0;
   selectedEmailCategory = signal<string>('cv');
   selectedReadStatus = signal<string>('all');
   isInviteChecked = signal<boolean>(false); 
+  companyId: string = '';
+  c_Type: string = 'cv';
+  jobId: number = 0;
+  type: string = '';
 
-  constructor(private communicationService: CommunicationService , private router: Router) {}
+  constructor(
+    private communicationService: CommunicationService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
-    this.loadSentEmails(this.currentPage);
+    this.route.queryParams.subscribe(params => {
+      this.companyId = params['companyId'];
+      this.c_Type = params['c_Type'] || 'cv';
+      this.jobId = params['jobId'] ? parseInt(params['jobId']) : 0;
+      this.type = params['type'];
+
+      if (this.companyId) {
+        if (this.type === 'job' && this.jobId) {
+          this.selectedEmailCategory.set('ap');
+        } else if (this.c_Type === 'ap') {
+          this.selectedEmailCategory.set('ap');
+        } else if (this.c_Type === 'iv') {
+          this.selectedEmailCategory.set('iv');
+        }
+        this.loadSentEmails(1);
+      }
+    });
+    
     this.fetchJobs();
     this.checkedEmails = new Array(this.emails.length).fill(false);
-
-
   }
 
   loadSentEmails(pageNo: number, r_Type?: number): void {
     this.loading.set(true);
     this.emails = [];
-    const companyId = this.communicationService.getCompanyId();
+    const companyId = localStorage.getItem('CompanyId') || '';
+    const searchQuery = this.keyword.value?.trim() || '';
   
     let category = this.selectedEmailCategory();
     if (this.isInviteChecked()) {
       category = 'iv'; 
     }
-  
-    if (r_Type === undefined) {
+
+    if (this.type === 'job' && this.jobId) {
+      this.communicationService.getJobSpecificEmails(companyId, this.jobId)
+        .subscribe({
+          next: (response) => {
+            this.handleResponse(response, pageNo);
+            if (searchQuery) {
+              this.filterEmailsBySearch(searchQuery);
+            }
+          },
+          error: (error) => {
+            console.error('Error fetching job-specific emails:', error);
+          },
+        });
+    } else if (r_Type === undefined) {
       this.communicationService.getemailsinbox(companyId, pageNo, category, this.pageSize)
         .subscribe({
           next: (response) => {
             this.handleResponse(response, pageNo);
+            if (searchQuery) {
+              this.filterEmailsBySearch(searchQuery);
+            }
           },
           error: (error) => {
             console.error('Error fetching sent emails:', error);
@@ -67,6 +108,9 @@ export class SentEmailsComponent {
         .subscribe({
           next: (response) => {
             this.handleResponse(response, pageNo);
+            if (searchQuery) {
+              this.filterEmailsBySearch(searchQuery);
+            }
           },
           error: (error) => {
             console.error('Error fetching sent emails:', error);
@@ -74,6 +118,18 @@ export class SentEmailsComponent {
         });
     }
   }
+
+  private filterEmailsBySearch(query: string): void {
+    if (!query) return;
+    
+    const searchTerm = query.toLowerCase();
+    this.emails = this.emails.filter(email => 
+      email.job?.toLowerCase().includes(searchTerm)
+    );
+    this.totalRecords = this.emails.length;
+    this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
+  }
+
   isAllSelected(): boolean {
     return this.selectedEmails.length === this.emails.length;
   }
@@ -116,7 +172,7 @@ export class SentEmailsComponent {
   
   handleResponse(response: any, pageNo: number): void {
     if (response.responseType === 'success' && response.data) {
-      this.emails = [...response.data.emails];
+      this.emails = response.data.emails;
       this.totalRecords = response.data.totalRecords;
       this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
       this.currentPage = pageNo;
@@ -154,6 +210,7 @@ export class SentEmailsComponent {
   onSearch(): void {
     const query = this.keyword.value?.trim();
     this.fetchJobs(query);
+    this.loadSentEmails(1);
   }
 
   getEmailDetails(rId: number, name: string): void {
@@ -168,13 +225,22 @@ export class SentEmailsComponent {
       },
     });
   }
+  get pagesToShow(): number[] {
+    if (this.totalPages <= this.maxVisiblePages + 2) {
+      return Array.from({ length: this.totalPages - 1 }, (_, i) => i + 2);
+    }
+    return [2, 3]; 
+  }
   goToPage(pageNo: number): void {
-    if (pageNo >= 1 && pageNo <= this.totalPages) {
-      this.loadSentEmails(pageNo);
+    if (pageNo >= 1 && pageNo <= this.totalPages && pageNo !== this.currentPage) {
+      this.currentPage = pageNo;
+      this.loadSentEmails(this.currentPage);
     }
   }
+  
   updatePageSize(event: any): void {
     this.pageSize = parseInt(event.target.value, 10);
+    this.itemsPerPage = this.pageSize;
     this.currentPage = 1; 
     this.loadSentEmails(this.currentPage);
   }
@@ -200,6 +266,10 @@ export class SentEmailsComponent {
 
   isInviteDisabled(): boolean {
     return this.selectedEmailCategory() === 'cv';
+  }
+
+  isSearchDisabled(): boolean {
+    return (this.type === 'job' && this.jobId > 0) || this.selectedEmailCategory() === 'cv';
   }
 
   toggleInviteSelection(): void {
@@ -231,5 +301,9 @@ export class SentEmailsComponent {
   }
   redirectToEmailTemplate(): void {
     this.router.navigate(['/email-template'], );
+  }
+
+  isEmailCategoryDisabled(category: string): boolean {
+    return this.type === 'job' && this.jobId > 0 && category !== 'ap';
   }
 }

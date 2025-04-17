@@ -66,8 +66,24 @@ export class TemplateEditorComponent {
     }
   
     saveTemplate() {
-      if (this.templateForm.invalid) return;
-  
+      const nameControl = this.templateForm.get('name');
+      const contentControl = this.templateForm.get('content');
+
+      if (!nameControl?.value?.trim() && !contentControl?.value?.trim()) {
+        alert('Template name field is blank!');
+        return;
+      }
+
+      if (!nameControl?.value?.trim()) {
+        alert('Template name field is blank!');
+        return;
+      }
+
+      if (!contentControl?.value?.trim()) {
+        alert('Template text field is blank!');
+        return;
+      }
+
       const updatedTemplate = {
         templateID: this.templateID,
         templateTitle: this.templateForm.value.name,

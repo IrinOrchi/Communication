@@ -1,7 +1,7 @@
-<div class="bg-gray-100 h-auto w-auto p-8">
+<div class="bg-[#eeee]h-auto w-auto p-8">
     <div class="max-w-6xl mx-auto">
       <!-- Header Section -->
-      <div class="flex justify-between items-center mb-6">
+      <div class="flex justify-between items-center mb-1">
         <h2 class="text-2xl font-bold flex items-center gap-2"></h2>
         <div class="flex gap-2">
           <button
@@ -23,19 +23,19 @@
 
       </h2>
   
-      <div class="bg-white mt-4 rounded-lg border shadow-sm mb-2 p-8 mx-auto max-w-[1100px]">
+      <div class="bg-white mt-4 rounded-sm border shadow-sm mb-2 p-8 mx-auto max-w-[1200px]">
         <ng-container *ngIf="templateDetails() as template; else loading">
           <form [formGroup]="templateForm">
             <label class="block text-sm font-bold mb-2 text-gray-700" for="name">Template Name (required)</label>
             <input
               id="name"
               type="text"
-              class="form-control search_box_content actionCaller w-full px-2 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+              class="form-control search_box_content actionCaller w-full px-2 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
               placeholder="Type template name"
               formControlName="name"
               maxlength="15" />
   
-            <p class="text-black text-[14px] mt-1">Last Update: {{ template.lastUpdated | date: 'medium' }}</p>
+            <p class="text-black text-[14px] mt-1">Last Update: {{ template.lastUpdated | date: 'd MMM yyyy' }}</p>
   
             <label class="block mt-4 text-sm font-bold mb-2 text-gray-700" for="content">Template Text (required)</label>
             <textarea
@@ -51,8 +51,7 @@
               </p>
             <button
               type="button"
-              class="mt-4 text-[14px] bg-[#337ab7] hover:bg-[#2e6da4] text-white font-sans px-4 py-2 rounded-md transition duration-300"
-              [disabled]="templateForm.invalid"
+              class="mt-2 text-[14px] bg-[#337ab7] hover:bg-[#2e6da4] text-white font-sans px-4 py-2 rounded-md transition duration-300"
               (click)="saveTemplate()">
               Submit
             </button>
@@ -64,12 +63,12 @@
         class="mt-2 flex items-center w-full -ml-4 text-[14px] hover:text-[#23527c] text-left font-bold text-[#337ab7] py-2 px-4 rounded-md transition duration-300"
         (click)="toggleAccordion()"
         [attr.aria-expanded]="isAccordionOpen">
-        <span [class.rotate-180]="isAccordionOpen" class="icon icon-angle-top transition-transform duration-300"></span>
+        <span class="icon" [class]="isAccordionOpen ? 'icon-angle-top' : 'icon-angle-bottom'"></span>
         <span class="ml-1">What is Template Name and Template Text?</span>
       </button>
       
       <div *ngIf="isAccordionOpen" class="accordionContent p-4 -mt-2 ">
-        <strong class="block  font-bold text-[14px] -ml-4">Template Name</strong>
+        <strong class="block  font-bold text-[14px] -ml-4  focus:ring-blue-500 focus:border-blue-500">Template Name</strong>
         <p class="text-[14px] text-gray-700  -ml-4">
           A piece of text that makes a tag for an email template so that you can easily pick your desired one.
         </p>
