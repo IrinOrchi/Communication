@@ -1,25 +1,31 @@
 <div class="flex flex-col gap-1 w-[817px]">
   <label class="block text-sm font-semibold text-gray-700 mb-1">
     {{ label }}
-    <span *ngIf="isRequired" class="text-red-500">*</span>
+    @if (isRequired) {
+      <span class="text-red-500">*</span>
+    }
   </label>
 
   <div class="flex flex-wrap gap-3 justify-start items-center">
-    <div *ngFor="let option of options" class="option-container">
-      <label class="custom-radio-container">
-        <input
-          type="radio"
-          [value]="option"
-          [formControl]="control"
-          class="radio-input"
-        />
-        <span class="custom-radio-button"></span>
-        <span class="option-text">{{ option }}</span>
-      </label>
-    </div>
+    @for (option of options; track option) {
+      <div class="option-container">
+        <label class="custom-radio-container">
+          <input
+            type="radio"
+            [value]="option"
+            [formControl]="control"
+            class="radio-input"
+          />
+          <span class="custom-radio-button"></span>
+          <span class="option-text">{{ option }}</span>
+        </label>
+      </div>
+    }
   </div>
 
-  <div *ngIf="control?.invalid && control?.touched" class="text-red-500 text-xs">
-    {{ errorMessage }}
-  </div>
+  @if (control?.invalid && control?.touched) {
+    <div class="text-red-500 text-xs">
+      {{ errorMessage }}
+    </div>
+  }
 </div>
