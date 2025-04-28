@@ -130,84 +130,94 @@
         Search
       </button>
     </div>
-      <!-- Loader -->
-<div *ngIf="loading()" class="flex items-center justify-center py-10">
-  <div class="w-12 h-12 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
-</div>
-<!-- Job Emails Table -->
-<div *ngIf="!loading() && dataLoaded()" class="max-w-6xl mx-auto mt-4 overflow-hidden border border-gray-200 rounded-md">
-  <table class="min-w-full bg-white divide-y divide-gray-300">
-    <thead class="bg-[#595959] text-white">
-      <tr>
-        <th class="p-3 text-left text-[14px] font-semibold uppercase tracking-wider">#</th>
-        <th class="p-3 text-left text-[14px] font-semibold uppercase tracking-wider">Jobs({{ jobs.length }})</th>
-        <th class="p-3 text-left text-[14px] font-semibold uppercase tracking-wider">Published Date</th>
-        <th class="p-3 text-center text-[14px] font-semibold uppercase tracking-wider">Sent Email(s)</th>
-        <th class="p-3 text-center text-[14px] font-semibold uppercase tracking-wider">Read Email(s)</th>
-      </tr>
-    </thead>
-    <tbody class="bg-white divide-y divide-gray-200">
-      <ng-container *ngIf="jobs.length > 0; else noData">
-        <tr *ngFor="let job of jobs; let i = index" class="transition hover:bg-gray-100">
-          <td class="p-3 text-center text-[12px]">
-            <span class="bg-[#595959] text-white rounded-full w-[22px] h-[22px] flex items-center justify-center font-semibold">
-              {{ i + 1 }}
-            </span>
-          </td>
-          <td class="p-3 text-sm font-medium text-left text-gray-900">{{ job.job }}</td>
-          <td class="p-3 text-sm text-left text-gray-600">
-            <span class="mr-2 icon icon-calendar"></span>{{ job.publishDate | date: 'MMM dd, yyyy' }}
-          </td>
-          <td class="p-3 text-sm text-center text-gray-600">
-            <button 
-              class="text-gray-600"
-              [disabled]="job.sentEmail === 0"
-              (click)="redirectToJobSentEmails(job.jobId)">
-              {{ job.sentEmail }}
-            </button>
-          </td>
-          <td class="p-3 text-sm text-center text-gray-600">
-            <button 
-              class="text-gray-600"
-              [disabled]="job.readEmail === 0"
-              (click)="redirectToJobReadEmails(job.jobId)">
-              {{ job.readEmail }}
-            </button>
-          </td>
-        </tr>
-      </ng-container>
-    </tbody>
-  </table>
-</div>
-<!-- No Data Found Message -->
-<ng-template #noData>
-  <tr>
-    <td colspan="5" class="px-6 py-16 text-sm font-medium text-center text-gray-500">
-      <div class="flex flex-col items-center">
-        <i class="text-gray-400 icon icon-envelope" style="font-size: 64px;"></i>
-        <span class="text-[16px] font-semibold text-[#0e73a9] mt-2">No data found</span>
-      </div>
-    </td>
-  </tr>
-</ng-template>
+
+    <!-- Loader -->
+    @if (loading()) {
+    <div class="flex items-center justify-center py-10">
+        <div class="w-12 h-12 border-4 border-blue-500 rounded-full border-t-transparent animate-spin">
+        </div>
+    </div>
+  }
+
+    <!-- Job Emails Table -->
+    @if (!loading() && dataLoaded()) {
+      <div class="max-w-6xl mx-auto mt-4 overflow-hidden border border-gray-200 rounded-md">
+        <table class="min-w-full bg-white divide-y divide-gray-300">
+          <thead class="bg-[#595959] text-white">
+            <tr>
+              <th class="p-3 text-left text-[14px] font-semibold uppercase tracking-wider">#</th>
+              <th class="p-3 text-left text-[14px] font-semibold uppercase tracking-wider">Jobs({{ jobs.length }})</th>
+              <th class="p-3 text-left text-[14px] font-semibold uppercase tracking-wider">Published Date</th>
+              <th class="p-3 text-center text-[14px] font-semibold uppercase tracking-wider">Sent Email(s)</th>
+              <th class="p-3 text-center text-[14px] font-semibold uppercase tracking-wider">Read Email(s)</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            @if (jobs.length > 0) {
+              @for (job of jobs; track job.jobId; let i = $index) {
+                <tr class="transition hover:bg-gray-100">
+                  <td class="p-3 text-center text-[12px]">
+                    <span class="bg-[#595959] text-white rounded-full w-[22px] h-[22px] flex items-center justify-center font-semibold">
+                      {{ i + 1 }}
+                    </span>
+                  </td>
+                  <td class="p-3 text-sm font-medium text-left text-gray-900">{{ job.job }}</td>
+                  <td class="p-3 text-sm text-left text-gray-600">
+                    <span class="mr-2 icon icon-calendar"></span>{{ job.publishDate | date: 'MMM dd, yyyy' }}
+                  </td>
+                  <td class="p-3 text-sm text-center text-gray-600">
+                    <button 
+                      class="text-gray-600"
+                      [disabled]="job.sentEmail === 0"
+                      (click)="redirectToJobSentEmails(job.jobId)">
+                      {{ job.sentEmail }}
+                    </button>
+                  </td>
+                  <td class="p-3 text-sm text-center text-gray-600">
+                    <button 
+                      class="text-gray-600"
+                      [disabled]="job.readEmail === 0"
+                      (click)="redirectToJobReadEmails(job.jobId)">
+                      {{ job.readEmail }}
+                    </button>
+                  </td>
+                </tr>
+              }
+            } @else {
+              <tr>
+                <td colspan="5" class="px-6 py-16 text-sm font-medium text-center text-gray-500">
+                  <div class="flex flex-col items-center">
+                    <i class="text-gray-400 icon icon-envelope" style="font-size: 64px;"></i>
+                    <span class="text-[16px] font-semibold text-[#0e73a9] mt-2">No data found</span>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      
+    </div>
+  }
+
     <div class="flex flex-col items-start mt-4">
       <div class="flex mt-2 mb-12 space-x-2">
-        <button
-          *ngFor="let page of totalPagesArray"
-          class="px-4 py-2 transition-colors rounded"
-          [style.backgroundColor]="currentPage === page ? '#0e73a9' : '#0e73a9'"
-          [style.color]="currentPage === page ? 'white' : 'black'"
-          (click)="changePage(page)">
-          {{ page }}
-        </button>
+        @for (page of totalPagesArray; track page) {
+          <button
+            class="px-4 py-2 transition-colors rounded"
+            [style.backgroundColor]="currentPage === page ? '#0e73a9' : '#0e73a9'"
+            [style.color]="currentPage === page ? 'white' : 'black'"
+            (click)="changePage(page)">
+            {{ page }}
+          </button>
+        }
       </div>
 
       <!-- Email Templates Button -->
       <button 
-      class="bg-[#0e73a9] hover:bg-[#08547a] text-white px-4 py-2 rounded transition duration-300"
-      (click)="redirectToEmailTemplate()">
-      Email Template
-    </button>
+        class="bg-[#0e73a9] hover:bg-[#08547a] text-white px-4 py-2 rounded transition duration-300"
+        (click)="redirectToEmailTemplate()">
+        Email Template
+      </button>
     </div>
   </div>
 </div> 
