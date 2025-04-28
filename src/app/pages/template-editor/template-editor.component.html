@@ -7,7 +7,7 @@
           <button
             class="bg-[#0c6899] hover:bg-[#08547a] text-white px-3 py-2 rounded flex items-center gap-2 transition duration-300"
             (click)="redirectTo('https://corporate3.bdjobs.com/cvsearch.asp')">
-            <i class="icon icon-search"></i> Search CV Bank
+            <i class="icon icon-search"></i> Search Talent
           </button>
   
           <button
@@ -44,6 +44,7 @@
               formControlName="content"
               rows="5"
               maxlength="3400"
+              style="resize: vertical;"
               (input)="updateCharacterCount()"></textarea>
               
               <p *ngIf="isTyping" class="text-sm text-gray-600">

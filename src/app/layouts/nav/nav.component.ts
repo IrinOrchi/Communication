@@ -10,11 +10,12 @@ import { NavbarService } from './services/navbar.service';
 import { SalesPersonData, CreditSystem, cvSearchService, JobPostingService, NavResponse } from './class/navbarResponse';
 import { reinitializePreline } from '../../preline-init';
 import { DropdownComponent } from '../../components/dropdown/dropdown.component';
+import { ModalComponent } from '../../components/modal/modal.component';
 
 @Component({
   selector: 'app-nav',
   standalone: true,
-  imports: [RouterModule,CommonModule, DropdownComponent],
+  imports: [RouterModule,CommonModule, DropdownComponent, ModalComponent, NoCreditComponent],
   templateUrl: './nav.component.html',
   styleUrl: './nav.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -24,7 +25,8 @@ export class NavComponent implements OnInit, AfterViewInit{
   creditSystem: CreditSystem = {} as CreditSystem;
   cvSearchService: cvSearchService = {} as cvSearchService;
   jobPostingService: JobPostingService = {} as JobPostingService;
-  currentDate: string= '';
+  currentDate: string = '';
+  isExpired: boolean = false;
   cvBankPercentage: number = 0;
   navData: any;
   smsPercent=0;
@@ -49,7 +51,7 @@ export class NavComponent implements OnInit, AfterViewInit{
 
   ngOnInit(): void {
     this.getNavbar();
-    this.currentDate = new Date().toISOString();
+    this.currentDate = new Date().toISOString().split('T')[0];
   }
 
   ngAfterViewInit(): void {
@@ -57,14 +59,22 @@ export class NavComponent implements OnInit, AfterViewInit{
     reinitializePreline();
   }
 
+  checkExpiration(validityDate: string): boolean {
+    if (!validityDate) return true;
+    const today = new Date(this.currentDate);
+    const expiry = new Date(validityDate);
+    return expiry < today;
+  }
+
   getNavbar() {
     const companyId = this.localStorageService.getItem(CompanyIdLocalStorage);
     const userId = this.localStorageService.getItem(UserId);
     this.navbarService.getNavbarData({ companyId, userId }).subscribe({
       next: (res: NavResponse) => {
-         this.navbarDataLoaded.emit(res.data as SalesPersonData);
+        this.navbarDataLoaded.emit(res.data as SalesPersonData);
         this.navData = res.data;
-        this.smsPercent = Math.ceil((this.navData.smsRemaining *100)/ this.navData.smsPurchased);
+        const rawSmsPercent = (this.navData.smsRemaining * 100) / this.navData.smsPurchased;
+        this.smsPercent = rawSmsPercent < 1.5 ? 1 : Math.ceil(rawSmsPercent);
         this.smsPercent = this.smsPercent < 0 ? 0 : this.smsPercent;
 
         this.creditSystem = (res.data.creditSystem ?? {}) as CreditSystem;
@@ -84,7 +94,7 @@ export class NavComponent implements OnInit, AfterViewInit{
         }, 0);
       },
       error: (err) => {
-      console.error(err);
+        console.error(err);
       }
     });
   }
@@ -93,11 +103,8 @@ export class NavComponent implements OnInit, AfterViewInit{
       attributes: {
         modalWidth: '700px',
       },
-      inputs: {
-        modalTitle: ''
-        // Additional inputs can be added here
-      },
-      componentRef: NoCreditComponent,
+      inputs: {},
+      componentRef: NoCreditComponent
     });
   }
   isObjectEmpty(obj: any): boolean {

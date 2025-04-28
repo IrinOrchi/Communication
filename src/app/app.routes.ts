@@ -13,31 +13,43 @@ export const routes: Routes = [
     {
         path:'',
         component: CommunicationComponent,
-        // canActivate: [AuthGuard], 
+        canActivate: [AuthGuard], 
 
     },
     {
         path:'email-template',
-        component: EmailTemplateComponent
+        component: EmailTemplateComponent,
+        canActivate: [AuthGuard], 
+
     },
     {
         path:'template-viewer',
-        component: TemplateViewerComponent
+        component: TemplateViewerComponent,
+        canActivate: [AuthGuard], 
+
     },
     {
         path:'template-editor',
-        component: TemplateEditorComponent
+        component: TemplateEditorComponent,
+        canActivate: [AuthGuard], 
+
     },
     {
         path:"sent-emails",
-        component: SentEmailsComponent
+        component: SentEmailsComponent,
+        canActivate: [AuthGuard], 
+
     },
     {
         path:'read-emails',
-        component: ReadEmailsComponent
+        component: ReadEmailsComponent,
+        canActivate: [AuthGuard], 
+
     },
     {
         path:'template-creator',
-        component: TemplateCreatorComponent
+        component: TemplateCreatorComponent,
+        canActivate: [AuthGuard], 
+
     }
 ];

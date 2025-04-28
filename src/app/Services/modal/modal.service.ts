@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Type } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { ModalConfig } from '../../Models/Shared/models';
 import { ModalAttributes } from '../../utils/app.const';
@@ -8,21 +8,21 @@ import { ModalAttributes } from '../../utils/app.const';
 })
 export class ModalService {
   private configs: ModalConfig = {
-    componentRef: null as any,
+    componentRef: null as unknown as Type<any>,
     attributes: ModalAttributes,
     inputs: {},
+    isClose: true
   };
 
   public onCloseModalSubject = new BehaviorSubject<boolean>(false);
   public onCloseModal$ = this.onCloseModalSubject.asObservable();
 
-  private modalConfig = new BehaviorSubject<ModalConfig>(
-    this.configs
-  );
+  private modalConfig = new BehaviorSubject<ModalConfig>(this.configs);
   public modalConfig$ = this.modalConfig.asObservable();
 
   setModalConfigs(configs: ModalConfig) {
     if (configs.componentRef) {
+      configs.isClose = false; // Set isClose to false when opening modal
       this.modalConfig.next(configs);
       this.configs = configs;
     }
@@ -31,11 +31,12 @@ export class ModalService {
   getModalConfigs = () => this.configs;
 
   closeModal = () => {
-    this.modalConfig.next({
-      componentRef: null as any,
-      attributes: {},
-      isClose: true,
-    });
+    const closedConfig: ModalConfig = {
+      ...this.configs,
+      componentRef: null as unknown as Type<any>,
+      isClose: true
+    };
+    this.modalConfig.next(closedConfig);
+    this.configs = closedConfig;
   }
-    
 }

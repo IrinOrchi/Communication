@@ -8,7 +8,7 @@
         <button 
           class="bg-[#0c6899] hover:bg-[#08547a] text-white px-3 py-2 rounded flex items-center gap-2 transition duration-300"
           (click)="redirectTo('https://corporate3.bdjobs.com/cvsearch.asp')">
-          <i class="icon icon-search"></i> Search CV Bank
+          <i class="icon icon-search"></i> Search Talent
         </button>
       
         <!-- Post a New Job Button -->
@@ -292,7 +292,7 @@
           <p class="text-[#757575] tex-[14px] ml-2">
           Regards, <br>
           <span class="">{{ emailDetail.sender }}</span> <br>
-          {{ emailDetail.designation }}
+          {{ emailDetail.designation }}, {{ emailDetail.company }}
           </p>
         </div>
       </div>

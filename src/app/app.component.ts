@@ -1,4 +1,4 @@
-import { Component, isDevMode, OnInit } from '@angular/core';
+import { Component, isDevMode, OnInit, inject } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { SalesContactComponent } from './components/sales-contact/sales-contact.component';
@@ -6,16 +6,30 @@ import { FooterComponent } from './layouts/footer/footer.component';
 import { Title } from '@angular/platform-browser';
 import { filter } from 'rxjs';
 import { NavComponent } from "./layouts/nav/nav.component";
+import { ModalComponent } from './components/modal/modal.component';
+import { ModalService } from './Services/modal/modal.service';
+import { CommonModule } from '@angular/common';
+import { SalesPersonData } from './layouts/nav/class/navbarResponse';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, SalesContactComponent, FooterComponent, NavComponent],
+  imports: [
+    RouterOutlet, 
+    NavbarComponent, 
+    SalesContactComponent, 
+    FooterComponent, 
+    NavComponent,
+    ModalComponent,
+    CommonModule
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
   title = 'employee-account';
+  modalService = inject(ModalService);
+  salesPersonData: SalesPersonData | null = null;
 
   constructor(private router: Router, private titleService: Title) {}
 
@@ -32,10 +46,14 @@ export class AppComponent implements OnInit {
     });
 
     //local env
-    // if (isDevMode()) {
-    //   window.localStorage.setItem('CompanyId', 'IECwPxC=');
-    //   window.localStorage.setItem('UserId', 'ZRG7PRSz');
-    // }
+    if (isDevMode()) {
+      window.localStorage.setItem('CompanyId', 'ZxU0PRC=');
+      window.localStorage.setItem('UserId', 'ZRd9PxCu');
+    }
+  }
+
+  onNavbarDataLoaded(data: SalesPersonData) {
+    this.salesPersonData = data;
   }
 
   private updateTitle(route: string): void {

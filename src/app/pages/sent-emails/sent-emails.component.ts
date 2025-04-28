@@ -77,6 +77,8 @@ export class SentEmailsComponent implements OnInit {
       category = 'iv'; 
     }
 
+    const startIndex = (pageNo - 1) * this.pageSize;
+
     if (this.type === 'job' && this.jobId) {
       this.communicationService.getJobSpecificEmails(companyId, this.jobId)
         .subscribe({
@@ -88,6 +90,7 @@ export class SentEmailsComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error fetching job-specific emails:', error);
+            this.loading.set(false);
           },
         });
     } else if (r_Type === undefined) {
@@ -101,6 +104,7 @@ export class SentEmailsComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error fetching sent emails:', error);
+            this.loading.set(false);
           },
         });
     } else {
@@ -114,6 +118,7 @@ export class SentEmailsComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error fetching sent emails:', error);
+            this.loading.set(false);
           },
         });
     }
@@ -172,10 +177,14 @@ export class SentEmailsComponent implements OnInit {
   
   handleResponse(response: any, pageNo: number): void {
     if (response.responseType === 'success' && response.data) {
-      this.emails = response.data.emails;
-      this.totalRecords = response.data.totalRecords;
+      this.emails = response.data.emails || [];
+      this.totalRecords = response.data.totalRecords || 0;
       this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
       this.currentPage = pageNo;
+      
+      if (this.emails.length > this.pageSize) {
+        this.emails = this.emails.slice(0, this.pageSize);
+      }
     }
     this.loading.set(false);
   }
@@ -247,6 +256,7 @@ export class SentEmailsComponent implements OnInit {
   
   updateEmailCategory(category: string): void {
     this.selectedEmailCategory.set(category);
+    this.c_Type = category;
     this.isInviteChecked.set(false); 
     this.loadSentEmails(1);
   }

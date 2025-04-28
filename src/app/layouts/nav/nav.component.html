@@ -26,9 +26,9 @@
     <nav class="2xl:max-w-[82rem] mx-auto 2xl:px-4 xl:px-[66px] w-full sm:flex sm:items-center sm:justify-between "
       aria-label="Global">
       <div class="flex items-center gap-4 ml-8">
-        <a class="font-bold text-base text-[#263238] whitespace-nowrap 
+        <a class="font-semibold text-base text-[#263238] whitespace-nowrap 
           hover:underline hover:decoration-[2px] hover:underline-offset-[21px] hover:text-[#0e73a9]"
-          href="https://recruiter.bdjobs.com/dashboard" aria-current="page" style="font-size: 16px; font-weight: 700;">
+          href="https://recruiter.bdjobs.com/dashboard" aria-current="page" style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600;">
           Job Dashboard
         </a>
         <div class="relative w-28 h-8">
@@ -37,8 +37,8 @@
           </a>
           <!-- <div class="absolute top-[41.5px] w-[60px] h-0.5 bg-[#0E73A9]"></div> -->
         </div>
-        <a class="font-bold text-base text-[#263238] whitespace-nowrap hover:underline-offset-[21px] hover:underline hover:decoration-[2px] hover:text-[#0e73a9]"
-          href="https://corporate3.bdjobs.com/Analytics/default.asp?from=recruiter" aria-current="page" style="font-size: 16px; font-weight: 700;">
+        <a class="font-semibold text-base text-[#263238] whitespace-nowrap hover:underline-offset-[21px] hover:underline hover:decoration-[2px] hover:text-[#0e73a9]"
+          href="https://corporate3.bdjobs.com/Analytics/default.asp?from=recruiter" aria-current="page" style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600;">
           Analytics
         </a>
 
@@ -69,7 +69,7 @@
 
       <div id="navbar-with-mega-menu"
         class="hs-collapse hidden overflow-hidden transition-all duration-300 basis-full grow sm:block">
-        <div class="flex flex-col gap-5 mt-5 sm:flex-row sm:items-center sm:justify-end sm:mt-0 sm:ps-5 sm:pr-0">
+        <div class="flex flex-col gap-2 mt-5 sm:flex-row sm:items-center sm:justify-end sm:mt-0 sm:ps-2 sm:pr-0">
           @if(!loadingJobPostingService()){
           <!-- Job posting Access -->
           <app-dropdown class="relative">
@@ -87,11 +87,7 @@
                 </div>
               </div>
               <span class="ps-2 max-w-36 truncate text-[#0e73a9]">Job Posting</span>
-              <svg class="ms-1 flex-shrink-0 size-4 text-[#0e73a9]" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="m6 9 6 6 6-6" />
-              </svg>
+              <span class="icon-sort-down text-[#0e73a9] " style="transform: scale(0.6);"></span>
             </div>
             <div dropdown-content>
               <div class="flex items-start gap-1 p-2">
@@ -189,12 +185,9 @@
                   <span class="text-center text-xs font-bold text-[#A65108]">{{cvBankPercentage}}%</span>
                 </div>
               </div>
-              <span class="ps-2 max-w-36 truncate">Talent Search</span>
-              <svg class="ms-1 flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="m6 9 6 6 6-6" />
-              </svg>
+              <span class="ps-2 max-w-36 truncate text-[#0e73a9]">Talent Search</span>
+              <span class="icon-sort-down text-[#0e73a9] " style="transform: scale(0.6);"></span>
+
             </div>
             <div dropdown-content>
               <div class="flex items-start gap-1 p-2">
@@ -229,17 +222,17 @@
 
           @if(!loadingCreditSystem()){
           <!-- credit system dropdown -->
-          <app-dropdown class="relative min-h-[38px] flex items-center border-l-0 ">
-            <div dropdown-trigger class="flex items-center">
+          <app-dropdown class="relative min-h-[38px] flex items-center border-l-0">
+            <div dropdown-trigger class="flex items-center h-[38px]">
               <img src="https://recruiter.bdjobs.com/assets/images/credit-system.svg" alt="" class="h-[26px]" />
-              <span class="ps-2 max-w-36 truncate text-[#0e73a9]">
+              <span class="ps-2 max-w-36 truncate text-[#0e73a9] flex items-center -mt-1">
                 Credit:
                 <span class="px-1">
-                  {{ creditSystem.validityDate < currentDate ? 0 : (creditSystem.remainingCredit || 0) }}
+                  {{ checkExpiration(creditSystem.validityDate) ? 0 : (creditSystem.remainingCredit || 0) }}
                 </span>
               </span>
-              <div class="inline-flex items-center justify-center text-gray-700">
-                <span class="icon-sort-down text-[#0e73a9] " style="transform: scale(0.6);"></span>
+              <div class="inline-flex items-center justify-center text-gray-700 -mt-1">
+                <span class="icon-sort-down text-[#0e73a9]" style="transform: scale(0.6) translateY(-1px);"></span>
               </div>
             </div>
             <div dropdown-content>
@@ -265,9 +258,9 @@
                     </div>
                     <div>
                       <h3 class="crdtitle">Validity</h3>
-                      <p [ngClass]="{'text-[#b71c1c]': creditSystem.validityDate < currentDate, 'text-[#0E73A9]': creditSystem.validityDate >= currentDate}"
+                      <p [ngClass]="{'text-[#b71c1c]': checkExpiration(creditSystem.validityDate), 'text-[#0E73A9]': !checkExpiration(creditSystem.validityDate)}"
                         class="text-[12px] font-bold m-0">
-                        {{ creditSystem.validityDate < currentDate ? 'Expired' : (creditSystem.validityDate |
+                        {{ checkExpiration(creditSystem.validityDate) ? 'Expired' : (creditSystem.validityDate |
                           date:'dd MMM yyyy') }}
                       </p>
                     </div>
@@ -287,11 +280,11 @@
           </app-dropdown>
           }
           <!-- profile dropdown -->
-          <app-dropdown class="relative border-l-0 sm:border-l-2 border-[#0e73a9] ps-0 sm:ps-4 mr-8">
+          <app-dropdown class="relative border-l-0 mr-8">
             <div dropdown-trigger class="flex items-center">
               <img class="inline-block w-[38px] h-[38px] border-2 border-[#DDF2FD] rounded-full" [src]="companyLogoURL || 'https://recruiter.bdjobs.com/assets/images/default-company.png'"
                 alt="Image Description" />
-              <span class="ps-2 text-[#0e73a9]">
+              <span class="ps-2 text-[#0e73a9] max-w-[150px] truncate">
                 {{companyName || 'Company Profile'}}</span>
               <div class="ml-1 inline-flex items-center justify-center text-gray-700">
                 <span class="icon-sort-down text-[#0e73a9]" style="transform: scale(0.6);"></span>

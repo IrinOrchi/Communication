@@ -79,6 +79,9 @@ export class ReadEmailsComponent {
         category = 'iv'; 
       }
 
+      // Calculate the start index for pagination
+      const startIndex = (pageNo - 1) * this.pageSize;
+
       if (this.type === 'job' && this.jobId) {
         this.communicationService.getJobSpecificEmails(companyId, this.jobId, r_Type)
           .subscribe({
@@ -90,6 +93,7 @@ export class ReadEmailsComponent {
             },
             error: (error) => {
               console.error('Error fetching job-specific emails:', error);
+              this.loading.set(false);
             },
           });
       } else if (r_Type !== undefined) {
@@ -103,6 +107,7 @@ export class ReadEmailsComponent {
             },
             error: (error) => {
               console.error('Error fetching sent emails:', error);
+              this.loading.set(false);
             },
           });
       } else {
@@ -116,6 +121,7 @@ export class ReadEmailsComponent {
             },
             error: (error) => {
               console.error('Error fetching sent emails:', error);
+              this.loading.set(false);
             },
           });
       }
@@ -134,10 +140,14 @@ export class ReadEmailsComponent {
     
     handleResponse(response: any, pageNo: number): void {
       if (response.responseType === 'success' && response.data) {
-        this.emails = response.data.emails;
-        this.totalRecords = response.data.totalRecords;
+        this.emails = response.data.emails || [];
+        this.totalRecords = response.data.totalRecords || 0;
         this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
         this.currentPage = pageNo;
+        
+        if (this.emails.length > this.pageSize) {
+          this.emails = this.emails.slice(0, this.pageSize);
+        }
       }
       this.loading.set(false);
     }
@@ -201,6 +211,7 @@ export class ReadEmailsComponent {
   
     updateEmailCategory(category: string): void {
       this.selectedEmailCategory.set(category);
+      this.c_Type = category;
       this.isInviteChecked.set(false); 
       this.loadSentEmails(1);
     }
