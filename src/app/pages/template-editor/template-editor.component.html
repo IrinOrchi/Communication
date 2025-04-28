@@ -24,7 +24,7 @@
       </h2>
   
       <div class="bg-white mt-4 rounded-sm border shadow-sm mb-2 p-8 mx-auto max-w-[1200px]">
-        <ng-container *ngIf="templateDetails() as template; else loading">
+        @if (templateDetails(); as template) {
           <form [formGroup]="templateForm">
             <label class="block text-sm font-bold mb-2 text-gray-700" for="name">Template Name (required)</label>
             <input
@@ -47,9 +47,11 @@
               style="resize: vertical;"
               (input)="updateCharacterCount()"></textarea>
               
-              <p *ngIf="isTyping" class="text-sm text-gray-600">
-                You can type maximum  <span class="text-red-500 mr-1">{{ maxCharacters - currentCharCount }}</span>character(s).
-              </p>
+              @if (isTyping) {
+                <p class="text-sm text-gray-600">
+                  You can type maximum  <span class="text-red-500 mr-1">{{ maxCharacters - currentCharCount }}</span>character(s).
+                </p>
+              }
             <button
               type="button"
               class="mt-2 text-[14px] bg-[#337ab7] hover:bg-[#2e6da4] text-white font-sans px-4 py-2 rounded-md transition duration-300"
@@ -57,7 +59,7 @@
               Submit
             </button>
           </form>
-        </ng-container>
+        }
 
         <!-- FAQ Accordion Section -->
         <button
@@ -68,28 +70,30 @@
         <span class="ml-1">What is Template Name and Template Text?</span>
       </button>
       
-      <div *ngIf="isAccordionOpen" class="accordionContent p-4 -mt-2 ">
-        <strong class="block  font-bold text-[14px] -ml-4  focus:ring-blue-500 focus:border-blue-500">Template Name</strong>
-        <p class="text-[14px] text-gray-700  -ml-4">
-          A piece of text that makes a tag for an email template so that you can easily pick your desired one.
-        </p>
-        <p class="text-[14px] text-gray-700 mt-2 -ml-4">
-          You can type maximum <strong class="font-bold">15</strong> characters for a <strong>Template Name</strong>.</p>
-        <p class="text-[14px] text-gray-700 mt-2 -ml-4">
-            <strong class="font-bold">Template text</strong> is  simple paragraph that can be used as your email body which you are supposed to send.</p>
-        <app-email-template-modal #emailModal></app-email-template-modal>
+      @if (isAccordionOpen) {
+        <div class="accordionContent p-4 -mt-2">
+          <strong class="block  font-bold text-[14px] -ml-4  focus:ring-blue-500 focus:border-blue-500">Template Name</strong>
+          <p class="text-[14px] text-gray-700  -ml-4">
+            A piece of text that makes a tag for an email template so that you can easily pick your desired one.
+          </p>
+          <p class="text-[14px] text-gray-700 mt-2 -ml-4">
+            You can type maximum <strong class="font-bold">15</strong> characters for a <strong>Template Name</strong>.</p>
+          <p class="text-[14px] text-gray-700 mt-2 -ml-4">
+              <strong class="font-bold">Template text</strong> is  simple paragraph that can be used as your email body which you are supposed to send.</p>
+          <app-email-template-modal #emailModal></app-email-template-modal>
 
-        <a 
-          href="javascript:void(0)"
-          id="mail_sample"
-          class="text-[#337ab7] text-[14px] hover:text-[#23527c] mt-3 inline-block -ml-4"
-          (click)="openExample()">
-          View example
-        </a>
-      </div>
-        <ng-template #loading>
+          <a 
+            href="javascript:void(0)"
+            id="mail_sample"
+            class="text-[#337ab7] text-[14px] hover:text-[#23527c] mt-3 inline-block -ml-4"
+            (click)="openExample()">
+            View example
+          </a>
+        </div>
+      }
+        @else {
           <p class="text-[#212121]"><span class="icon icon spinner">Loading email template... </span></p>
-        </ng-template>
+        }
       </div>
     </div>
   
